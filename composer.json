@@ -1,5 +1,8 @@
 {
     "name": "solcloud/proxy",
+    "description": "PHP proxy implementation using dispatchers and endpoints for scalable solutions",
+    "license": "MIT",
+    "keywords": ["proxy", "http"],
     "require": {
         "php": ">= 7.1",
         "solcloud/http": "^1.0",
