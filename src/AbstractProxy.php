@@ -84,10 +84,10 @@ abstract class AbstractProxy
      * Process Request and print Response
      * @param Request $request if NULL Request will be parsed from POST data using requestPostKey
      */
-    public function process(Request $request = NULL): void
+    public function process(Request $request = null): void
     {
         try {
-            $this->setRequest($request === NULL ? $this->parseRequest() : $request);
+            $this->setRequest($request === null ? $this->parseRequest() : $request);
 
             $this->run();
         } catch (Throwable $ex) {
@@ -133,7 +133,7 @@ abstract class AbstractProxy
         }
 
         $request = @unserialize($_POST[$this->requestPostKey]);
-        if ($request === FALSE) {
+        if ($request === false) {
             throw new ProxyException('Unserialization of Request failed');
         }
 
@@ -143,14 +143,14 @@ abstract class AbstractProxy
     /**
      * Send POST request with Request object to given url, parsing Response object from (hopefully serialized) response
      * @param string $url intercom url
-     * @param array  $aditionalData additional POST data for intercom
+     * @param array  $additionalData additional POST data for intercom
      */
-    protected function forward(string $url, array $aditionalData = [])
+    protected function forward(string $url, array $additionalData = [])
     {
         $this->internalCommunicationUrl = $url;
 
         $postFields = array_merge(
-            $aditionalData
+            $additionalData
             , [
                 $this->requestPostKey => serialize($this->request),
             ]
@@ -171,7 +171,7 @@ abstract class AbstractProxy
             ->setMethod('POST')
             ->setUrl($url)
             ->setPostFields($postFields)
-            ->setFollowLocation(TRUE)
+            ->setFollowLocation(true)
             ->setVerifyHost($this->getRequest()->getVerifyHost())
             ->setVerifyPeer($this->getRequest()->getVerifyPeer())
             ->setConnectionTimeoutSec($this->getRequest()->getConnectionTimeoutSec())
@@ -204,7 +204,7 @@ abstract class AbstractProxy
     protected function setResponseFromSerializedString(string $serializedResponseString): void
     {
         $response = @unserialize($serializedResponseString);
-        if ($response === FALSE) {
+        if ($response === false) {
             throw new ProxyException('Unserialization of Response failed');
         }
 
@@ -227,7 +227,7 @@ abstract class AbstractProxy
     protected function setResponse(Response $response): void
     {
         $responseException = $response->getException();
-        if ($responseException !== NULL && $responseException instanceof HttpException) {
+        if ($responseException !== null && $responseException instanceof HttpException) {
             throw $responseException;
         }
 
