@@ -275,11 +275,6 @@ abstract class AbstractProxy
         return $this->curlRequestFactory;
     }
 
-    protected function getRequestPostKey(): string
-    {
-        return $this->requestPostKey;
-    }
-
     public function getSubsequentProxyProcessingOverheadMilliseconds(): int
     {
         return $this->subsequentProxyProcessingOverheadMilliseconds;
