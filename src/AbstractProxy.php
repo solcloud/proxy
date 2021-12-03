@@ -81,7 +81,7 @@ abstract class AbstractProxy
     }
 
     /**
-     * Process Request and print Response
+     * Process Request and print Response, please dont print anything after or we will add exit() :)
      * @param Request $request if NULL Request will be parsed from POST data using requestPostKey
      */
     public function process(Request $request = null): void
@@ -158,7 +158,7 @@ abstract class AbstractProxy
 
         $response = $this->curlRequestFactory->fetchResponse($this->createCommunicationRequest($url, $postFields));
 
-        $this->setResponseFromSerializedString($response->getBody());
+        $this->setResponseFromSerialized($response);
     }
 
     /**
@@ -194,20 +194,34 @@ abstract class AbstractProxy
      */
     protected function printResponse()
     {
-        echo serialize($this->getResponse());
+        $body = $this->getResponse()->getBody();
+        $this->getResponse()->setBody('');
+        header('x-solcloud-proxy: ' . base64_encode(serialize($this->getResponse())));
+        echo $body;
+        $this->getResponse()->setBody($body);
     }
 
     /**
-     * Try to set Response by unserializing $serializedResponseString
+     * Try to set "target" Response by inspecting $internalResponse
      * @throws ProxyException or subclass - if unserializition failed or Response has exception
      */
-    protected function setResponseFromSerializedString(string $serializedResponseString): void
+    protected function setResponseFromSerialized(Response $internalResponse): void
     {
-        $response = @unserialize($serializedResponseString);
+        $data = $internalResponse->getLastHeadersFormatted()['x-solcloud-proxy'] ?? false;
+        if ($data) {
+            $data = base64_decode($data, true);
+        }
+        if ($data === false) {
+            throw new ProxyException('Decoding of Response failed');
+        }
+
+        $response = @unserialize($data);
         if ($response === false) {
             throw new ProxyException('Unserialization of Response failed');
         }
 
+        /** @var Response $response */
+        $response->setBody($internalResponse->getBody());
         $this->setResponse($response);
     }
 
